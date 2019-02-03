@@ -1,9 +1,11 @@
 import os
 import matplotlib.pyplot as plt
 import cv2
+import argparse
 from matplotlib.widgets import RectangleSelector
 from write_to_XML import write_xml
 import shutil
+from datetime import datetime
 #Author: Mark Jay
 
 img = None
@@ -13,7 +15,7 @@ object_list = []
 annotated_dir = "annotated_images"
 #constants
 
-image_folder = "images"
+image_folder = ""
 savedir = "annotations"
 obj = "scorpion"
 
@@ -32,7 +34,7 @@ def onkeypress(event):
     global img
     if event.key == "q":
         fd = open("progress.log", "a")
-        fd.write(img.name + " completed\n")
+        fd.write(str(datetime.today()) + " " +  img.name + " completed\n")
         if not os.path.isdir(annotated_dir):
             os.mkdir(annotated_dir)
         print(img.path)
@@ -46,7 +48,7 @@ def onkeypress(event):
         plt.close()
     elif event.key == "r":
         fd = open("img_for_revision.txt", "a")
-        fd.write(img.name + "\n")
+        fd.write(str(datetime.today()) + " " + img.name + "\n")
         tl_list = []
         br_list = []
         object_list = []
@@ -58,6 +60,10 @@ def toggle_selector(event):
     toggle_selector.RS.set_active(True)
 
 if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-d", "--imagedir", required=True, help="path to images")
+    args = vars(ap.parse_args())
+    image_folder = args["imagedir"]
     num_imgs = (len(list(os.scandir(image_folder))))
     for n, image_file in enumerate(os.scandir(image_folder)):
         cnt = n + 1
